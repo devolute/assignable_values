@@ -21,7 +21,9 @@ module AssignableValues
           unless allow_blank? && value.blank?
             begin
               assignable_values = assignable_values(record)
-              assignable_values.include?(value) or record.errors.add(property, I18n.t('errors.messages.inclusion'))
+              [value].flatten.each do |v|
+                assignable_values.include?(v) or record.errors.add(property, I18n.t('errors.messages.inclusion'))                  
+              end
             rescue DelegateUnavailable
               # if the delegate is unavailable, the validation is skipped
             end
@@ -34,7 +36,7 @@ module AssignableValues
           assignable_values << old_value if old_value.present?
           assignable_values |= raw_assignable_values(record)
           assignable_values = decorate_values(assignable_values)
-          assignable_values
+          assignable_values.flatten.uniq
         end
 
         def set_default(record)
