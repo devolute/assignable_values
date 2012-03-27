@@ -20,8 +20,9 @@ module AssignableValues
           value = current_value(record)
           unless allow_blank? && value.blank?
             begin
-              unless assignable_value?(record, value)
-                record.errors.add(property, not_included_error_message)
+              assignable_values = assignable_values(record)
+              [value].flatten.each do |v|
+                assignable_values.include?(v) or record.errors.add(property, not_included_error_message)
               end
             rescue DelegateUnavailable
               # if the delegate is unavailable, the validation is skipped
@@ -41,9 +42,9 @@ module AssignableValues
           assignable_values = []
           old_value = previously_saved_value(record)
           assignable_values << old_value if old_value.present?
-          assignable_values |= raw_assignable_values(record)
+          assignable_values |= raw_assignable_values(record)          
           if decorate
-            assignable_values = decorate_values(assignable_values)
+            assignable_values = decorate_values(assignable_values.flatten.uniq)
           end
           assignable_values
         end

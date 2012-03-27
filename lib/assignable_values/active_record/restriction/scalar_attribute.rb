@@ -15,7 +15,9 @@ module AssignableValues
               @hardcoded_humanizations[value]
             else
               dictionary_scope = "assignable_values.#{model.name.underscore}.#{property}"
-              I18n.t(value, :scope => dictionary_scope, :default => default_humanization_for_value(value))
+              [value].flatten.map do |v|
+                I18n.t(v, :scope => dictionary_scope, :default => default_humanization_for_value(v))
+              end.join(', ')
             end
           end
         end
