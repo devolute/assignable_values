@@ -35,8 +35,8 @@ module AssignableValues
           old_value = previously_saved_value(record)
           assignable_values << old_value if old_value.present?
           assignable_values |= raw_assignable_values(record)
-          assignable_values = decorate_values(assignable_values)
-          assignable_values.flatten.uniq
+          assignable_values = decorate_values(assignable_values.flatten.uniq)
+          assignable_values
         end
 
         def set_default(record)
