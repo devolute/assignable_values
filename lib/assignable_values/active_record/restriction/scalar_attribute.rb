@@ -10,8 +10,9 @@ module AssignableValues
 
         def humanize_string_value(value)
           if value.present?
-            dictionary_key = "assignable_values.#{model.name.underscore}.#{property}.#{value}"
-            I18n.t(dictionary_key, :default => value.humanize)
+            [value].flatten.map do |v|
+              dictionary_key = "assignable_values.#{model.name.underscore}.#{property}.#{v}"           I18n.t(dictionary_key, :default => v.humanize)
+            end.join(', ')
           end
         end
 
