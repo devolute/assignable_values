@@ -80,6 +80,11 @@ describe AssignableValues::ActiveRecord do
             song = @klass.new(:active => true)
             song.humanized_active.should == 'Yes'
           end
+          
+          it 'should also work for false' do
+            song = @klass.new(:active => false)
+            song.humanized_active.should == 'No'
+          end
 
           it 'should generate a method returning the humanized value, which is nil when the value is blank' do
             song = @klass.new
