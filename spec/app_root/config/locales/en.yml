@@ -7,4 +7,7 @@ en:
       genre:
         pop: 'Pop music'
         rock: 'Rock music'
+      active:
+        "true": 'Yes'
+        "false": 'No'
         

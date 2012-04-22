@@ -5,6 +5,7 @@ class CreateSongs < ActiveRecord::Migration
       t.integer :artist_id
       t.string :genre
       t.integer :year
+      t.boolean :active
     end
   end
 
