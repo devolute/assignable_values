@@ -18,15 +18,12 @@ module AssignableValues
         end
 
         def humanize_boolean_value(value)
-          if value.present?
-            [value].flatten.map do |v|
-              label = v ? "true" : "false"
-              dictionary_key = "assignable_values.#{model.name.underscore}.#{property}.#{label}"
-              I18n.t(dictionary_key, :default => label)
-            end.join(', ')
-          end
-          
-        end
+          [value].flatten.map do |v|
+            label = v ? "true" : "false"
+            dictionary_key = "assignable_values.#{model.name.underscore}.#{property}.#{label}"
+            I18n.t(dictionary_key, :default => label)
+          end.join(', ')
+         end
         
         private
 
