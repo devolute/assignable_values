@@ -22,6 +22,9 @@ describe AssignableValues::ActiveRecord do
             assignable_values_for :genre do
               %w[pop rock]
             end
+            assignable_values_for :active, :allow_blank => true do
+              [true, false]
+            end
           end
         end
 
@@ -49,17 +52,21 @@ describe AssignableValues::ActiveRecord do
           record.reload.should be_valid
         end
 
-        it 'should generate a method returning the humanized value' do
-          song = @klass.new(:genre => 'pop')
-          song.humanized_genre.should == 'Pop music'
-        end
+        context "for a string value" do
+        
+          it 'should generate a method returning the humanized value' do
+            song = @klass.new(:genre => 'pop')
+            song.humanized_genre.should == 'Pop music'
+          end
 
-        it 'should generate a method returning the humanized value, which is nil when the value is blank' do
-          song = @klass.new
-          song.genre = nil
-          song.humanized_genre.should be_nil
-          song.genre = ''
-          song.humanized_genre.should be_nil
+          it 'should generate a method returning the humanized value, which is nil when the value is blank' do
+            song = @klass.new
+            song.genre = nil
+            song.humanized_genre.should be_nil
+            song.genre = ''
+            song.humanized_genre.should be_nil
+          end
+        
         end
 
         it 'should generate a method to retrieve the humanization of any given value' do
@@ -67,6 +74,24 @@ describe AssignableValues::ActiveRecord do
           song.humanized_genre('rock').should == 'Rock music'
         end
 
+        context "for a boolean value" do
+        
+          it 'should generate a method returning the humanized value' do
+            song = @klass.new(:active => true)
+            song.humanized_active.should == 'Yes'
+          end
+
+          it 'should generate a method returning the humanized value, which is nil when the value is blank' do
+            song = @klass.new
+            song.active = nil
+            song.humanized_active.should be_nil
+            song.active = ''
+            song.humanized_active.should be_nil
+          end
+          
+          
+        end
+        
       end
 
       context 'if the :allow_blank option is set' do
@@ -195,9 +220,9 @@ describe AssignableValues::ActiveRecord do
         klass.new(:genre => 'disallowed value').should_not be_valid
       end
 
-      it 'should be able to delegate to a lambda, which is evaluated in the context of the record instance' do
+      it 'should be able to delegate to a proc, which is evaluated in the context of the record instance' do
         klass = Song.disposable_copy do
-          assignable_values_for :genre, :through => lambda { delegate }
+          assignable_values_for :genre, :through => proc { delegate }
           def delegate
             OpenStruct.new(:assignable_song_genres => %w[pop rock])
           end
@@ -229,18 +254,18 @@ describe AssignableValues::ActiveRecord do
         klass.new.genre.should == 'pop'
       end
 
-      it 'should allow to set a default through a lambda' do
+      it 'should allow to set a default through a proc' do
         klass = Song.disposable_copy do
-          assignable_values_for :genre, :default => lambda { 'pop' } do
+          assignable_values_for :genre, :default => proc { 'pop' } do
             %w[pop rock]
           end
         end
         klass.new.genre.should == 'pop'
       end
 
-      it 'should evaluate a lambda default in the context of the record instance' do
-        klass = Song.disposable_copy do
-          assignable_values_for :genre, :default => lambda { default_genre } do
+      it 'should evaluate a proc default in the context of the record instance' do
+         klass = Song.disposable_copy do
+          assignable_values_for :genre, :default => proc { default_genre } do
             %w[pop rock]
           end
           def default_genre
@@ -389,8 +414,8 @@ describe AssignableValues::ActiveRecord do
             end
             klass.new.assignable_genres.collect(&:humanized).should == ['Pop music', 'Rock music']
           end
-
-          it 'should not define a method #humanized on values that are not strings' do
+          
+          it 'should not define a method #humanized on values that are not strings or boolean' do
             klass = Song.disposable_copy do
               assignable_values_for :year do
                 [1999, 2000, 2001]
