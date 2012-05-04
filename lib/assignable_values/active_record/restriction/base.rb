@@ -40,12 +40,12 @@ module AssignableValues
           @options[:unless] ? !call_condition(@options[:unless],record) : false
         end
 
-        def call_condition(condition)
+        def call_condition(condition,record)
           if condition.kind_of?(Symbol)
-            model.send(condition)
+            record.send(condition)
           elsif condition.kind_of?(Proc)
             if condition.arity == 1
-              condition.call(model)
+              condition.call(record)
             elsif
               condition.call
             end
