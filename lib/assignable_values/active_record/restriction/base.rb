@@ -32,12 +32,12 @@ module AssignableValues
           end
         end
         
-        def should?
-          @options[:if] ? options[:if].call(model) : true
+        def should?(record)
+          @options[:if] ? call_condition(@options[:if],record) : true
         end
         
-        def should_not?
-          @options[:unless] ? !@options[:unless].call(model) : false
+        def should_not?(record)
+          @options[:unless] ? !call_condition(@options[:unless],record) : false
         end
 
         def call_condition(condition)
