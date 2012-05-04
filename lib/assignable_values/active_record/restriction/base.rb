@@ -18,18 +18,40 @@ module AssignableValues
 
         def validate_record(record)
           value = current_value(record)
-          unless allow_blank? && value.blank?
-            begin
-              assignable_values = assignable_values(record)
-              [value].flatten.each do |v|
-                assignable_values.include?(v) or record.errors.add(property, not_included_error_message)
+          if  should?(record) && !should_not?(record)
+            unless (allow_blank? && value.blank?) 
+              begin
+                assignable_values = assignable_values(record)
+                [value].flatten.each do |v|
+                  assignable_values.include?(v) or record.errors.add(property, not_included_error_message)
+                end
+              rescue DelegateUnavailable
+                # if the delegate is unavailable, the validation is skipped
               end
-            rescue DelegateUnavailable
-              # if the delegate is unavailable, the validation is skipped
             end
           end
         end
+        
+        def should?(record)
+          @options[:if] ? call_condition(@options[:if],record) : true
+        end
+        
+        def should_not?(record)
+          @options[:unless] ? !call_condition(@options[:unless],record) : false
+        end
 
+        def call_condition(condition, record)
+          if condition.kind_of?(Symbol)
+            record.send(condition)
+          elsif condition.kind_of?(Proc)
+            if condition.arity == 1
+              condition.call(record)
+            elsif
+              condition.call
+            end
+          end
+        end        
+        
         def not_included_error_message
           I18n.t('errors.messages.inclusion', :default => 'is not included in the list')
         end
@@ -37,7 +59,6 @@ module AssignableValues
         def assignable_value?(record, value)
           assignable_values(record).include?(value)
         end
-
         def assignable_values(record, decorate = false)
           assignable_values = []
           old_value = previously_saved_value(record)
