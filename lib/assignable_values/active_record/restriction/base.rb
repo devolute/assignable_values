@@ -18,7 +18,7 @@ module AssignableValues
 
         def validate_record(record)
           value = current_value(record)
-          if  should? && !should_not?
+          if  should?(record) && !should_not?(record)
             unless (allow_blank? && value.blank?) 
               begin
                 assignable_values = assignable_values(record)
