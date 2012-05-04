@@ -18,18 +18,40 @@ module AssignableValues
 
         def validate_record(record)
           value = current_value(record)
-          unless allow_blank? && value.blank?
-            begin
-              assignable_values = assignable_values(record)
-              [value].flatten.each do |v|
-                assignable_values.include?(v) or record.errors.add(property, I18n.t('errors.messages.inclusion'))                  
+          if  should? && !should_not?
+            unless (allow_blank? && value.blank?) 
+              begin
+                assignable_values = assignable_values(record)
+                [value].flatten.each do |v|
+                  assignable_values.include?(v) or record.errors.add(property, I18n.t('errors.messages.inclusion'))                  
+                end
+              rescue DelegateUnavailable
+                # if the delegate is unavailable, the validation is skipped
               end
-            rescue DelegateUnavailable
-              # if the delegate is unavailable, the validation is skipped
             end
           end
         end
+        
+        def should?
+          @options[:if] ? options[:if].call(model) : true
+        end
+        
+        def should_not?
+          @options[:unless] ? !@options[:unless].call(model) : false
+        end
 
+        def call_condition(condition)
+          if condition.kind_of?(Symbol)
+            model.send(condition)
+          elsif condition.kind_of?(Proc)
+            if condition.arity == 1
+              condition.call(model)
+            elsif
+              condition.call
+            end
+          end
+        end
+        
         def assignable_values(record)
           assignable_values = []
           old_value = previously_saved_value(record)
