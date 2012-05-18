@@ -118,7 +118,7 @@ module AssignableValues
         end        
         
         def previously_saved_value(record)
-          record.send("#{property}_was")
+          record.send("#{property}_was") if record.respond_to?("#{property}_was")
         end
 
       end
