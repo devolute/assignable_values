@@ -55,6 +55,7 @@ module AssignableValues
         def humanize_type_for_value(value)
           return "string" if value.is_a?(String)
           return "boolean" if !!value == value
+          return "array" if value.kind_of?(Array)
           false
         end
         
@@ -68,7 +69,12 @@ module AssignableValues
             when "boolean"
             value.singleton_class.send(:define_method, :humanized) do
               restriction.humanize_boolean_value(value)
-            end 
+            end
+            when "array"
+            value.each do |v|
+              restriction.humanize_string_value(v)
+            end
+            end
           end
         end
 
@@ -83,14 +89,11 @@ module AssignableValues
             end
             value
           end
-        end
-
-        
+        end      
         
         def previously_saved_value(record)
           record.send("#{property}_was") if record.respond_to?("#{property}_was")
         end
-
 
       end
     end
