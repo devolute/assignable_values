@@ -74,7 +74,6 @@ module AssignableValues
             value.each do |v|
               restriction.humanize_string_value(v)
             end
-            end
           end
         end
 
