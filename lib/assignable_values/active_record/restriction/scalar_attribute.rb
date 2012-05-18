@@ -24,6 +24,10 @@ module AssignableValues
             I18n.t(dictionary_key, :default => label)
           end.join(', ')
          end
+
+        def humanize_array_value(value, separator = ', ')
+          value.map{|v| humanize_string_value(v)}.join(separator)
+        end
         
         private
 
@@ -32,12 +36,14 @@ module AssignableValues
           restriction = self
 
           enhance_model do
-            define_method "humanized_#{restriction.property}" do
+            define_method "humanized_#{restriction.property}" do |*args|
               value = send(restriction.property)
               if value.kind_of?(String)
                 restriction.humanize_string_value(value)
               elsif !!value == value
                 restriction.humanize_boolean_value(value)
+              elsif value.kind_of?(Array)
+                restriction.humanize_array_value(value, *args)
               end
             end
           end
