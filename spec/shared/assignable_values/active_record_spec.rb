@@ -3,8 +3,9 @@ require 'ostruct'
 
 describe AssignableValues::ActiveRecord do
 
-  describe '.assignable_values' do
 
+  describe '.assignable_values' do
+    
     it 'should raise an error when not called with a block or :through option' do
       expect do
         Song.disposable_copy do
@@ -12,7 +13,7 @@ describe AssignableValues::ActiveRecord do
         end
       end.to raise_error(AssignableValues::NoValuesGiven)
     end
-
+   
     context 'when validating scalar attributes' do
 
       context 'without options' do
@@ -22,9 +23,15 @@ describe AssignableValues::ActiveRecord do
             assignable_values_for :genre do
               %w[pop rock]
             end
+            
             assignable_values_for :active, :allow_blank => true do
               [true, false]
             end
+            
+            assignable_values_for :tags do
+              %w[pop rock]
+            end 
+                        
           end
         end
 
@@ -68,6 +75,7 @@ describe AssignableValues::ActiveRecord do
           end
         
         end
+        
 
         it 'should generate a method to retrieve the humanization of any given value' do
           song = @klass.new(:genre => 'pop')
@@ -94,6 +102,15 @@ describe AssignableValues::ActiveRecord do
             song.humanized_active.should be_nil
           end
           
+          
+        end
+        
+        context "for an array" do
+          
+          it 'should generate a method returning the humanized value' do
+            song = @klass.new(:tags => ["pop","rock"])
+            song.humanized_tags.should == "Pop, Rock"
+          end
           
         end
         
