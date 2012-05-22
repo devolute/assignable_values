@@ -10,4 +10,7 @@ en:
       active:
         "true": 'Yes'
         "false": 'No'
+      tags:
+        pop: 'Pop'
+        rock: 'Rock'
         
