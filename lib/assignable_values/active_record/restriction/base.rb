@@ -62,10 +62,12 @@ module AssignableValues
         end
 
         def set_default(record)
-          if record.new_record? && record.send(property).nil?
-            default_value = default
-            default_value = record.instance_eval(&default_value) if default_value.is_a?(Proc)
-            record.send("#{property}=", default_value)
+          if default?
+            if record.new_record? && record.send(property).nil?
+              default_value = default
+              default_value = record.instance_eval(&default_value) if default_value.is_a?(Proc)
+              record.send("#{property}=", default_value)
+            end
           end
           true
         end
