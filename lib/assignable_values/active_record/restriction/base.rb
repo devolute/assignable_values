@@ -62,12 +62,10 @@ module AssignableValues
         end
 
         def set_default(record)
-          if default?
-            if record.new_record? && record.send(property).nil?
-              default_value = default
-              default_value = record.instance_eval(&default_value) if default_value.is_a?(Proc)
-              record.send("#{property}=", default_value)
-            end
+          if record.new_record? && record.send(property).nil?
+            default_value = default
+            default_value = record.instance_eval(&default_value) if default_value.is_a?(Proc)
+            record.send("#{property}=", default_value)
           end
           true
         end
@@ -107,14 +105,16 @@ module AssignableValues
         end
 
         def setup_default
-          @default = options[:default]
-          restriction = self
-          enhance_model do
-            set_default_method = "set_default_#{restriction.property}"
-            define_method set_default_method do
-              restriction.set_default(self)
+          if default?
+            @default = options[:default]
+            restriction = self
+            enhance_model do
+              set_default_method = "set_default_#{restriction.property}"
+              define_method set_default_method do
+                restriction.set_default(self)
+              end
+              after_initialize set_default_method
             end
-            after_initialize set_default_method
           end
         end
 
