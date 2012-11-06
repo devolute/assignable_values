@@ -39,7 +39,7 @@ module AssignableValues
         def humanize_array_value(value, separator = ', ')
           value.map{|v| humanize_string_value(v)}.join(separator)
         end
-        
+
         private
 
         def default_humanization_for_value(value)
@@ -73,7 +73,7 @@ module AssignableValues
         def define_humanized_values_method
           restriction = self
 
-          enhance_model do            
+          enhance_model do
             define_method "humanized_#{restriction.property.to_s.pluralize}" do |*args|
               value = send(restriction.property)
               if value.kind_of?(String)
@@ -85,22 +85,22 @@ module AssignableValues
               end
             end
           end
-        end                
-        
+        end
+
         def humanize_type_for_value(value)
           return "string" if value.is_a?(String)
           return "boolean" if !!value == value
           return "array" if value.kind_of?(Array)
           false
         end
-        
+
         def define_humanized_for_type(value)
           restriction = self
           case humanize_type_for_value(value)
             when "string"
             value.singleton_class.send(:define_method, :humanized) do
               restriction.humanize_string_value(value)
-            end          
+            end
             when "boolean"
             value.singleton_class.send(:define_method, :humanized) do
               restriction.humanize_boolean_value(value)
@@ -124,7 +124,7 @@ module AssignableValues
             value
           end
         end
-        
+
         def previously_saved_value(record)
           record.send("#{property}_was") if record.respond_to?("#{property}_was")
         end

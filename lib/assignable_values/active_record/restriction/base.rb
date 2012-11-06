@@ -19,7 +19,7 @@ module AssignableValues
         def validate_record(record)
           value = current_value(record)
           if  should?(record) && !should_not?(record)
-            unless (allow_blank? && value.blank?) 
+            unless (allow_blank? && value.blank?)
               begin
                 assignable_values = assignable_values(record)
                 [value].flatten.each do |v|
@@ -31,11 +31,11 @@ module AssignableValues
             end
           end
         end
-        
+
         def should?(record)
           @options[:if] ? call_condition(@options[:if],record) : true
         end
-        
+
         def should_not?(record)
           @options[:unless] ? !call_condition(@options[:unless],record) : false
         end
@@ -50,8 +50,8 @@ module AssignableValues
               condition.call
             end
           end
-        end        
-        
+        end
+
         def not_included_error_message
           I18n.t('errors.messages.inclusion', :default => 'is not included in the list')
         end
@@ -63,7 +63,7 @@ module AssignableValues
           assignable_values = []
           old_value = previously_saved_value(record)
           assignable_values << old_value if old_value.present?
-          assignable_values |= raw_assignable_values(record)          
+          assignable_values |= raw_assignable_values(record)
           if decorate
             assignable_values = decorate_values(assignable_values.flatten.uniq)
           end
@@ -84,7 +84,7 @@ module AssignableValues
               # skip secondary defaults if querying assignable values from a nil delegate
             end
             record.send("#{property}=", default_value)
-          end          
+          end
           true
         end
 
@@ -221,4 +221,3 @@ module AssignableValues
     end
   end
 end
-
